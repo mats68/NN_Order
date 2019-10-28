@@ -8,6 +8,8 @@
 #property version   "1.00"
 #property strict
 
+#include <stdlib.mqh> 
+
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
@@ -23,7 +25,7 @@ double CalculateATR(string pSymbol, datetime pTime, int pPeriod, int pATRPeriod,
    if(iPercentCandleClosed < pPercentCandleClosed)
       iShift++;
    double dATR = iATR(pSymbol,pPeriod,pATRPeriod,iShift);
-   return (NormalizeDouble(dATR,4));
+   return dATR;
   }
 //+------------------------------------------------------------------+
 
@@ -33,56 +35,124 @@ double CalculateATR(string pSymbol, datetime pTime, int pPeriod, int pATRPeriod,
 
 struct struct_PositionSize
   {
-   double  dPPositionSize;
-   double Prize;
-   double dStopLoss;
-   double dTakeProfit;
-   double dRiskMoney;
-   int iLotDigits;
+   double            dPositionSize;
+   double            Prize;
+   double            dStopLoss;
+   double            dTakeProfit;
+   double            dRiskMoney;
+   int               iLotDigits;
   };
 
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
 struct_PositionSize CalculatePositionSize(string pSymbol, double pATR, double pAccountBalance, double pRisk, double pATRSLFactor, double pATRTPFactor, bool pBuy,
-                             double pMODE_TICKSIZE, double pMODE_TICKVALUE, double pMODE_LOTSTEP, int pMODE_DIGITS, double pMODE_ASK, double pMODE_BID
-                            )
+      double pTICKSIZE, double pTICKVALUE, double pLOTSTEP, int pDIGITS, double pASK, double pBID
+                                         )
   {
-// double Size = AccountBalance(); // AccountEquity();
    double RiskMoney = pAccountBalance * pRisk / 100;
-   int lotdigits     = - MathRound(MathLog(pMODE_LOTSTEP) / MathLog(10.0));
+   int lotdigits     = - MathRound(MathLog(pLOTSTEP) / MathLog(10.0));
    double dStopLoss = pATRSLFactor * pATR;
    double dTP1 = pATRTPFactor * pATR;
    double PositionSize = 0;
    string sOrderKind = "buy";
 
-   if((dStopLoss > 0) && (pMODE_TICKVALUE != 0) && (pMODE_TICKSIZE != 0))
-      PositionSize = RiskMoney / (dStopLoss * pMODE_TICKVALUE / pMODE_TICKSIZE);
+   if((dStopLoss > 0) && (pTICKVALUE != 0) && (pTICKSIZE != 0))
+      PositionSize = RiskMoney / (dStopLoss * pTICKVALUE / pTICKSIZE);
 
    double dNormalizedPositionSize = NormalizeDouble(PositionSize,lotdigits);
 
-   double dPrice = pMODE_ASK;
+   double dPrice = pASK;
    double dPrizeSL = dPrice-dStopLoss;
    double dPrizeTP1 = dPrice+dTP1;
    if(pBuy == false)
      {
       sOrderKind = "sell";
-      dPrice = pMODE_BID;
+      dPrice = pBID;
       dPrizeSL = dPrice+dStopLoss;
       dPrizeTP1 = dPrice-dTP1;
      }
-//Alert(pMODE_DIGITS);
-   double dNormalizedPrizeSL = NormalizeDouble(dPrizeSL, pMODE_DIGITS);
-   double dNormalizedPrizeTP1 = NormalizeDouble(dPrizeTP1, pMODE_DIGITS);
+   double dNormalizedPrizeSL = NormalizeDouble(dPrizeSL, pDIGITS);
+   double dNormalizedPrizeTP1 = NormalizeDouble(dPrizeTP1, pDIGITS);
 
-// Comment(sOrderKind, " ", _Symbol, "\n\rRisk in %: ", extRisk, "\n\rPrice: ", dPrice, "\n\rSL: ", DoubleToStr(dNormalizedPrizeSL,pMODE_DIGITS), "\n\rTP1: ", DoubleToStr(dNormalizedPrizeTP1,pMODE_DIGITS), "\n\rPosition-Size: ", DoubleToStr(dNormalizedPositionSize,lotdigits), "\n\rATR: ", pATR);
-   //struct_PositionSize ps = {PositionSize, dPrizeSL, dPrizeTP1, RiskMoney};
+// Comment(sOrderKind, " ", _Symbol, "\n\rRisk in %: ", extRisk, "\n\rPrice: ", dPrice, "\n\rSL: ", DoubleToStr(dNormalizedPrizeSL,pDIGITS), "\n\rTP1: ", DoubleToStr(dNormalizedPrizeTP1,pDIGITS), "\n\rPosition-Size: ", DoubleToStr(dNormalizedPositionSize,lotdigits), "\n\rATR: ", pATR);
    struct_PositionSize ps;
-   ps.dPPositionSize = PositionSize;
+   ps.dPositionSize = dNormalizedPositionSize;
    ps.Prize = dPrice;
    ps.dStopLoss = dPrizeSL;
    ps.dTakeProfit = dPrizeTP1;
    ps.dRiskMoney = RiskMoney;
    ps.iLotDigits = lotdigits;
-   
+
    return ps;
+
+  }
+//+------------------------------------------------------------------+
+
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+bool OpenTradesForSymbol(string sOrderSymbol)
+  {
+
+   int itotal=OrdersTotal();
+
+   for(int i=0; i<itotal; i++) // for loop
+     {
+      if(OrderSelect(i, SELECT_BY_POS, MODE_TRADES) == true)
+         // check for opened position symbol
+         if(OrderSymbol()== sOrderSymbol)
+            return true;
+     }
+
+   return false;
+  }
+
+
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+string OpenOrders(
+   string   pSymbol,              // symbol 
+   int      pCmd,                 // operation 
+   double   pVolume,              // volume 
+   double   pPrice,               // price 
+   int      pSlippage,            // slippage 
+   double   pStoploss,            // stop loss 
+   double   pTakeprofit,          // take profit 
+   string   pComment=NULL        // comment 
+)
+  {
+   
+   int ticket = OrderSend(pSymbol,pCmd,pVolume,pPrice,pSlippage,pStoploss,pTakeprofit,pComment,0,0,Green);
+   if(ticket<0) 
+   {
+     int err = GetLastError();
+     if(err != ERR_NO_ERROR) return("Error: " + ErrorDescription(err)); else return ("");
+    
+   } 
+   return ("");
+   
+
+//   int openedTrade = OpenTradesForSymbol(_Symbol);
+//   if(openedTrade == true)
+//     {
+//      Alert("There is already an opened Trade with " + _Symbol);
+//      return;
+//     }
+//   int ticket = OrderSend(
+//                   _Symbol,
+//                   OP_SELL,
+//                   0.01,
+//                   Bid,
+//                   3,
+//                   Bid+50*_Point,
+//                   Bid-50*_Point,
+//                   NULL,
+//                   0,
+//                   0,
+//                   Green
+//                );
 
   }
 //+------------------------------------------------------------------+
