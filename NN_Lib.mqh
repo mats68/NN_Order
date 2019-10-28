@@ -1,14 +1,8 @@
-//+------------------------------------------------------------------+
-//|                                                       NN_Lib.mq4 |
-//|                        Copyright 2019, MetaQuotes Software Corp. |
-//|                                             https://www.mql5.com |
-//+------------------------------------------------------------------+
-#property copyright "Copyright 2019, MetaQuotes Software Corp."
-#property link      "https://www.mql5.com"
+#property copyright "M. Thaler"
 #property version   "1.00"
 #property strict
 
-#include <stdlib.mqh> 
+#include <stdlib.mqh>
 
 //+------------------------------------------------------------------+
 //|                                                                  |
@@ -89,6 +83,25 @@ struct_PositionSize CalculatePositionSize(string pSymbol, double pATR, double pA
   }
 //+------------------------------------------------------------------+
 
+//double NormalizeEntrySize(double size)
+//{
+//    double minlot  = MarketInfo(_Symbol, MODE_MINLOT);
+//    double lotstep = MarketInfo(_Symbol, MODE_LOTSTEP);
+//
+//    if (size <= minlot)
+//        return (minlot);
+//
+//    int steps = (int) MathRound((size - minlot) / lotstep);
+//    size = minlot + steps * lotstep;
+//
+//    if (size >= Maximum_Lots)
+//        size = Maximum_Lots;
+//
+//    size = NormalizeDouble(size, digits);
+//
+//    return (size);
+//}
+
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
@@ -113,46 +126,27 @@ bool OpenTradesForSymbol(string sOrderSymbol)
 //|                                                                  |
 //+------------------------------------------------------------------+
 string OpenOrders(
-   string   pSymbol,              // symbol 
-   int      pCmd,                 // operation 
-   double   pVolume,              // volume 
-   double   pPrice,               // price 
-   int      pSlippage,            // slippage 
-   double   pStoploss,            // stop loss 
-   double   pTakeprofit,          // take profit 
-   string   pComment=NULL        // comment 
+   string   pSymbol,              // symbol
+   int      pCmd,                 // operation
+   double   pVolume,              // volume
+   double   pPrice,               // price
+   int      pSlippage,            // slippage
+   double   pStoploss,            // stop loss
+   double   pTakeprofit,          // take profit
+   string   pComment=NULL        // comment
 )
   {
-   
+
    int ticket = OrderSend(pSymbol,pCmd,pVolume,pPrice,pSlippage,pStoploss,pTakeprofit,pComment,0,0,Green);
-   if(ticket<0) 
-   {
-     int err = GetLastError();
-     if(err != ERR_NO_ERROR) return("Error: " + ErrorDescription(err)); else return ("");
-    
-   } 
+   if(ticket<0)
+     {
+      int err = GetLastError();
+      if(err != ERR_NO_ERROR)
+         return("Error Nr." +  IntegerToString(err) + ": " + ErrorDescription(err));
+      else
+         return ("");
+
+     }
    return ("");
-   
-
-//   int openedTrade = OpenTradesForSymbol(_Symbol);
-//   if(openedTrade == true)
-//     {
-//      Alert("There is already an opened Trade with " + _Symbol);
-//      return;
-//     }
-//   int ticket = OrderSend(
-//                   _Symbol,
-//                   OP_SELL,
-//                   0.01,
-//                   Bid,
-//                   3,
-//                   Bid+50*_Point,
-//                   Bid-50*_Point,
-//                   NULL,
-//                   0,
-//                   0,
-//                   Green
-//                );
-
   }
 //+------------------------------------------------------------------+
