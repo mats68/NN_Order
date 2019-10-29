@@ -69,7 +69,6 @@ struct_PositionSize CalculatePositionSize(string pSymbol, double pATR, double pA
    double dNormalizedPrizeSL = NormalizeDouble(dPrizeSL, pDIGITS);
    double dNormalizedPrizeTP1 = NormalizeDouble(dPrizeTP1, pDIGITS);
 
-// Comment(sOrderKind, " ", _Symbol, "\n\rRisk in %: ", extRisk, "\n\rPrice: ", dPrice, "\n\rSL: ", DoubleToStr(dNormalizedPrizeSL,pDIGITS), "\n\rTP1: ", DoubleToStr(dNormalizedPrizeTP1,pDIGITS), "\n\rPosition-Size: ", DoubleToStr(dNormalizedPositionSize,lotdigits), "\n\rATR: ", pATR);
    struct_PositionSize ps;
    ps.dPositionSize = dNormalizedPositionSize;
    ps.Prize = dPrice;
@@ -105,7 +104,7 @@ struct_PositionSize CalculatePositionSize(string pSymbol, double pATR, double pA
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
-bool OpenTradesForSymbol(string sOrderSymbol)
+bool HasOpenTradesForSymbol(string sOrderSymbol)
   {
 
    int itotal=OrdersTotal();
@@ -125,7 +124,7 @@ bool OpenTradesForSymbol(string sOrderSymbol)
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
-string OpenOrders(
+string LaunchTrade(
    string   pSymbol,              // symbol
    int      pCmd,                 // operation
    double   pVolume,              // volume

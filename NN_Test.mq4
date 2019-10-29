@@ -48,12 +48,12 @@ void OnStart()
    double dTICKVALUE = 0.9012744020044343;
    double dTICKSIZE = 0.1;
 
- Print("MODE_TICKSIZE: ",MarketInfo(sSymbol, MODE_TICKSIZE));
- Print("MODE_TICKVALUE: ",MarketInfo(sSymbol, MODE_TICKVALUE));
- Print("MODE_LOTSTEP: ",MarketInfo(sSymbol,MODE_LOTSTEP));
- Print("MODE_DIGITS: ",MarketInfo(sSymbol,MODE_DIGITS));
- Print("MODE_ASK: ",MarketInfo(sSymbol,MODE_ASK));
- Print("MODE_BID: ",MarketInfo(sSymbol,MODE_BID));
+ //Print("MODE_TICKSIZE: ",MarketInfo(sSymbol, MODE_TICKSIZE));
+ //Print("MODE_TICKVALUE: ",MarketInfo(sSymbol, MODE_TICKVALUE));
+ //Print("MODE_LOTSTEP: ",MarketInfo(sSymbol,MODE_LOTSTEP));
+ //Print("MODE_DIGITS: ",MarketInfo(sSymbol,MODE_DIGITS));
+ //Print("MODE_ASK: ",MarketInfo(sSymbol,MODE_ASK));
+ //Print("MODE_BID: ",MarketInfo(sSymbol,MODE_BID));
 
 
 
@@ -103,12 +103,12 @@ void TestPositionSize(struct_PositionSize &pExpVal,
    struct_PositionSize ps = CalculatePositionSize(pSymbol, dATR, pAccountBalance, pRisk, pATRSLFactor, pATRTPFactor, pBuy,
                             pTICKSIZE, pTICKVALUE, pLOTSTEP, pDIGITS, pASK, pBID);
 
-   Print("dPPositionSize: ", ps.dPositionSize);
+   Print("Symbol: ", pSymbol);
+   Print("PositionSize: ", ps.dPositionSize);
    Print("Prize: ", ps.Prize);
    Print("dStopLoss: ", ps.dStopLoss);
    Print("dTakeProfit: ", ps.dTakeProfit);
-   Print("dRiskMoney: ", ps.dRiskMoney);
-   Print("iLotDigits: ", ps.iLotDigits);
+   Print("Risk %: ", pRisk);
 
   }
 
