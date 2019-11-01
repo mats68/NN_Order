@@ -136,7 +136,7 @@ string LaunchTrade(
 )
   {
 
-   int ticket = OrderSend(pSymbol,pCmd,pVolume,pPrice,pSlippage,pStoploss,pTakeprofit,pComment,0,0,Green);
+   int ticket = OrderSend(pSymbol,pCmd,pVolume,pPrice,pSlippage,pStoploss,pTakeprofit,pComment);
    if(ticket<0)
      {
       int err = GetLastError();
