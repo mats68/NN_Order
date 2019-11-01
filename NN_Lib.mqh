@@ -33,7 +33,6 @@ double CalculateATR(string pSymbol, datetime pTime, int pPeriod, int pATRPeriod,
 
 struct struct_PositionSize {
   double            dPositionSize;
-  double            Prize;
   double            dStopLoss;
   double            dTakeProfit;
   double            dRiskMoney;
@@ -44,35 +43,29 @@ struct struct_PositionSize {
 //|                                                                  |
 //+------------------------------------------------------------------+
 struct_PositionSize CalculatePositionSize(string pSymbol, double pATR, double pAccountBalance, double pRisk, double pATRSLFactor, double pATRTPFactor, bool pBuy,
-    double pTICKSIZE, double pTICKVALUE, double pLOTSTEP, int pDIGITS, double pASK, double pBID
-                                         ) {
+    double pTICKSIZE, double pTICKVALUE, double pLOTSTEP, int pDIGITS, double pPrice) {
   double RiskMoney = pAccountBalance * pRisk / 100;
   int lotdigits     = - MathRound(MathLog(pLOTSTEP) / MathLog(10.0));
   double dStopLoss = pATRSLFactor * pATR;
   double dTP1 = pATRTPFactor * pATR;
   double PositionSize = 0;
-  string sOrderKind = "buy";
 
   if((dStopLoss > 0) && (pTICKVALUE != 0) && (pTICKSIZE != 0))
     PositionSize = RiskMoney / (dStopLoss * pTICKVALUE / pTICKSIZE);
 
   double dNormalizedPositionSize = NormalizeDouble(PositionSize,lotdigits);
 
-  double dPrice = pASK;
-  double dPrizeSL = dPrice-dStopLoss;
-  double dPrizeTP1 = dPrice+dTP1;
+  double dPrizeSL = pPrice-dStopLoss;
+  double dPrizeTP1 = pPrice+dTP1;
   if(pBuy == false) {
-    sOrderKind = "sell";
-    dPrice = pBID;
-    dPrizeSL = dPrice+dStopLoss;
-    dPrizeTP1 = dPrice-dTP1;
+    dPrizeSL = pPrice+dStopLoss;
+    dPrizeTP1 = pPrice-dTP1;
   }
   double dNormalizedPrizeSL = NormalizeDouble(dPrizeSL, pDIGITS);
   double dNormalizedPrizeTP1 = NormalizeDouble(dPrizeTP1, pDIGITS);
 
   struct_PositionSize ps;
   ps.dPositionSize = dNormalizedPositionSize;
-  ps.Prize = dPrice;
   ps.dStopLoss = dPrizeSL;
   ps.dTakeProfit = dPrizeTP1;
   ps.dRiskMoney = RiskMoney;

@@ -41,8 +41,7 @@ void OnStart()
    double dATRSLFactor = 1.5;
    double dATRTPFactor = 1;
    bool bBuy = false;
-   double dBID = 1490.7;
-   double dASK = 1491;
+   double dPrice = 1490.7;
    double dDIGITS = 1.0;
    double dLOTSTEP = 0.01;
    double dTICKVALUE = 0.9012744020044343;
@@ -59,7 +58,7 @@ void OnStart()
 
    struct_PositionSize ps;
    TestPositionSize(ps,dDate,iPeriod, iATRPeriod, dPercentCandleClosed,
-   sSymbol, dAccountBalance, dRisk, dATRSLFactor, dATRTPFactor, bBuy, dTICKSIZE, dTICKVALUE, dLOTSTEP, dDIGITS, dASK, dBID);
+   sSymbol, dAccountBalance, dRisk, dATRSLFactor, dATRTPFactor, bBuy, dTICKSIZE, dTICKVALUE, dLOTSTEP, dDIGITS, dPrice);
 
 
   //  ps.dPPositionSize = dNormalizedPositionSize;
@@ -97,15 +96,14 @@ void TestATR(double pExpVal,string pSymbol, datetime pDate, int pPeriod, int pAT
 void TestPositionSize(struct_PositionSize &pExpVal,
                       datetime pDate, int pPeriod, int pATRPeriod, double pPercentCandleClosed,
                       string pSymbol, double pAccountBalance, double pRisk, double pATRSLFactor, double pATRTPFactor, bool pBuy,
-                      double pTICKSIZE, double pTICKVALUE, double pLOTSTEP, int pDIGITS, double pASK, double pBID)
+                      double pTICKSIZE, double pTICKVALUE, double pLOTSTEP, int pDIGITS, double dPrice)
   {
    double dATR = CalculateATR(pSymbol, pDate, pPeriod, pATRPeriod, pPercentCandleClosed);
    struct_PositionSize ps = CalculatePositionSize(pSymbol, dATR, pAccountBalance, pRisk, pATRSLFactor, pATRTPFactor, pBuy,
-                            pTICKSIZE, pTICKVALUE, pLOTSTEP, pDIGITS, pASK, pBID);
+                            pTICKSIZE, pTICKVALUE, pLOTSTEP, pDIGITS, dPrice);
 
    Print("Symbol: ", pSymbol);
    Print("PositionSize: ", ps.dPositionSize);
-   Print("Prize: ", ps.Prize);
    Print("dStopLoss: ", ps.dStopLoss);
    Print("dTakeProfit: ", ps.dTakeProfit);
    Print("Risk %: ", pRisk);
